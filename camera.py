@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QImage, QPixmap
-import sys, cv2, threading, random
+import sys, cv2, threading, random ,time
 
 app = QtWidgets.QApplication(sys.argv)
 window_w, window_h = 800, 800          # 設定視窗長寬
@@ -37,7 +37,8 @@ label.setGeometry(0,0,window_w,int(window_w*scale)) # 設定 QLabel 位置和尺
 
 # 存檔時使用隨機名稱的函式
 def rename():
-    return str(random.random()*10).replace('.','')
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    return str(timestr).replace('.','')
                              
 
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')    # 設定存檔影片格式
