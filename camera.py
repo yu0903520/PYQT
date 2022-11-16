@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QImage, QPixmap
-import sys, cv2, threading, random ,time
+import sys, cv2, threading ,time
 
 app = QtWidgets.QApplication(sys.argv)
 window_w, window_h = 800, 800          # 設定視窗長寬
@@ -35,7 +35,7 @@ Form.closeEvent = closeOpenCV               # 視窗關閉時觸發
 label = QtWidgets.QLabel(Form)
 label.setGeometry(0,0,window_w,int(window_w*scale)) # 設定 QLabel 位置和尺寸
 
-# 存檔時使用隨機名稱的函式
+# 存檔時使用時間名稱的函式
 def rename():
     timestr = time.strftime("%Y%m%d-%H%M%S")
     return str(timestr).replace('.','')
