@@ -10,6 +10,9 @@ ocv = True
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')   # 設定存檔影片格式
 recorderType = False                        # 設定是否處於錄影狀態，預設 False
 output = None
+depth=6   # 深度數值
+frequency=30   # 頻率
+round=1   # 回合數
 
 # 存檔時使用時間名稱的函式
 def rename():
@@ -32,12 +35,13 @@ class Camera(QWidget, Ui_Form):
         self.timer.start(30)
         self.startVideo.clicked.connect(self.start_video)
         self.stopVideo.clicked.connect(self.stop_video)
+        self.exit_btn.clicked.connect(self.exit)
         
         # 初始化 self.frame 變數
         self.frame = None
 
     def update_frame(self):
-        global recorderType, output
+        global recorderType, output, depth, frequency, round
         
         # 讀取攝像頭畫面
         ret, frame = self.cap.read()
@@ -45,7 +49,6 @@ class Camera(QWidget, Ui_Form):
         if ret:
             # 設定 self.frame 變數的值
             self.frame = frame
-            
             # 按下錄影時，將檔案儲存到 output
             if recorderType == True and output is not None:
                 output.write(self.frame)             
@@ -57,6 +60,11 @@ class Camera(QWidget, Ui_Form):
             q_image = QImage(image.data, width, height, bytes_per_line, QImage.Format_RGB888)
             pixmap = QPixmap.fromImage(q_image)
             self.img_label.setPixmap(pixmap)
+
+            # 顯示數值
+            self.depthLabel.setText(str(depth))
+            self.frequencyLabel.setText(str(frequency))
+            self.round.setText(str(round))
 
 
     def start_video(self):
@@ -79,14 +87,16 @@ class Camera(QWidget, Ui_Form):
             recorderType = True
 
     def stop_video(self):
-        global recorderType, output
+        global recorderType, output, depth
         # 釋放檔案資源
         if output is not None:
-
             output.release()                    # 釋放檔案資源
             recorderType = False                # 改為 False 表示停止錄影
-
+    
+    def exit(self):
+        self.close()
         
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     camera = Camera()
