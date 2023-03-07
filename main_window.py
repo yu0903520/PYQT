@@ -13,6 +13,8 @@ output = None
 depth=6   # 深度數值
 frequency=30   # 頻率
 round=1   # 回合數
+left=100   #左手角度
+right=0   #右手角度
 
 # 存檔時使用時間名稱的函式
 def rename():
@@ -40,6 +42,80 @@ class Camera(QWidget, Ui_Form):
         # 初始化 self.frame 變數
         self.frame = None
 
+
+    def get_angle_point(human, pos):
+        # 返回各个部位的关键点
+        pnts = []
+
+        if pos == 'left_elbow':
+            pos_list = (5, 6, 7)
+        elif pos == 'left_hand':
+            pos_list = (1, 5, 7)
+        elif pos == 'left_knee':
+            pos_list = (12, 13, 14)
+        elif pos == 'left_ankle':
+            pos_list = (5, 12, 14)
+        elif pos == 'right_elbow':
+            pos_list = (2, 3, 4)
+        elif pos == 'right_hand':
+            pos_list = (1, 2, 4)
+        elif pos == 'right_knee':
+            pos_list = (9, 10, 11)
+        elif pos == 'right_ankle':
+            pos_list = (2, 9, 11)
+        else:
+            print('Unknown  [%s]', pos)
+            return
+
+        for i in range(3):
+            if human[pos_list[i]][2] <= 0.1:
+                print('component [%d] incomplete' % (pos_list[i]))
+                return pnts
+            pnts.append((int(human[pos_list[i]][0]), int(human[pos_list[i]][1])))
+        return pnts
+    
+
+    def angle_between_points(p0, p1, p2):
+        # 计算角度
+        a = (p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2
+        b = (p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2
+        c = (p2[0] - p0[0]) ** 2 + (p2[1] - p0[1]) ** 2
+        try:
+            if a * b == 0:
+                return -1.0
+            else:
+                angle = math.acos((a + b - c) / math.sqrt(4 * a * b)) * 180 / math.pi
+        except:
+            angle == -1
+        return angle
+    
+
+    def angle_left_elbow(human):
+        pnts = get_angle_point(human, 'left_elbow')
+        if len(pnts) != 3:
+            print('component incomplete')
+            return
+
+        angle = 0
+        if pnts is not None:
+            angle = angle_between_points(pnts[0], pnts[1], pnts[2])
+            # print('left elbow angle:%f' % (angle))
+        return angle
+
+
+    def angle_right_elbow(human):
+        pnts = get_angle_point(human, 'right_elbow')
+        if len(pnts) != 3:
+            print('component incomplete')
+            return
+
+        angle = 0
+        if pnts is not None:
+            angle = angle_between_points(pnts[0], pnts[1], pnts[2])
+            # print('right elbow angle:%f' % (angle))
+        return angle
+    
+
     def update_frame(self):
         global recorderType, output, depth, frequency, round
         
@@ -62,6 +138,9 @@ class Camera(QWidget, Ui_Form):
             self.img_label.setPixmap(pixmap)
 
             # 顯示數值
+
+            self.left.setText(str(left))
+            self.right.setText(str(right))
             self.depthLabel.setText(str(depth))
             self.frequencyLabel.setText(str(frequency))
             self.round.setText(str(round))
